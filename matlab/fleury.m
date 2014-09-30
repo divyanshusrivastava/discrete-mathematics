@@ -17,19 +17,16 @@ function [result] = fleury (adj)
         %%%%%
         % check if the graph has proper values
         %%%%%
+        len = length(adj);
         
         %check if the graph is connected or not
         
-        len = length(adj);
-        something = adj^len;
-        for i=1:len
-            for j=1:len
-                if something(i,j)==0
-                    error('The entered matrix correxponds to a disconnected graph!!');
-                end
-            end
-        end
+        ret = check_connected(adj);
         
+        if ret == 0 
+            %% disconnected
+            error('The graph is disconnected!!');
+        end
         
                     
         % check if the graph will have circuit or path
@@ -59,8 +56,56 @@ function [result] = fleury (adj)
         if option == 1
             %%%%
             % compute Eularian circuit, start from anywhere 
+            stack = 1;
+            reduced_adj = adj;
             
+            paths = sum(sum(adj))/2;
+            while(length(stack) ~= paths)
             
+                links = ret_locs_of_ones(reduced_adj(stack(end),:));
+            
+                %% check if the link is a bridge
+                for j=1:length(links)
+                    adj_copy = adj;
+                    adj_copy(stack(end),links(j)) = 0;
+                    adj_copy(links(j),stack(end)) = 0;
+                    adj_copy
+                    ret = check_connected(adj_copy);
+                    
+                    
+                    
+                    if ret == 1
+                        %the link was not a bridge, therefore, can be
+                        %considered
+                        break;
+                    end
+              
+                end
+                if (ret == 1)
+                    %  not a bridge
+                    reduced_adj(stack(end),links(j)) = 0;
+                    reduced_adj(links(j),stack(end)) = 0;
+                    reduced_adj
+                    stack
+                    links
+                    
+                    stack (end+1) = links(j);
+
+                    
+                elseif(ret == -1)
+                    % all the links are bridge
+                    reduced_adj(stack(end),links(j)) = 0;
+                    reduced_adj(links(j),stack(end)) = 0;                   
+                    stack(end+1) = links(j);
+                    disp('gone here')
+
+                    
+                end
+                
+                
+              
+           
+            end
         elseif option == 2
             %%%%
             % compute Eularian Path, start from one of the vertex
@@ -73,6 +118,7 @@ function [result] = fleury (adj)
         
         
         % http://www.ctl.ua.edu/math103/euler/howcanwe.htm
+        result = stack;
         
     end
     
