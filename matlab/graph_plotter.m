@@ -12,7 +12,7 @@ temp = zeros(1,L);
 x = zeros(1,L);
 y = zeros(1,L);
 
-labels = {'a','b','c','d','e','f','g','h','i','j','k'};
+labels = {'a','b','c','d','e','f','g','h','i','j','k','l'};
 
 
 for i = 1:L
@@ -36,5 +36,5 @@ for i=1:L
 end
 
 
-scheduler(adj);
+%scheduler(adj);
 end

@@ -52,72 +52,149 @@ function [result] = fleury (adj)
         end
         
         
-        
+   
         if option == 1
             %%%%
             % compute Eularian circuit, start from anywhere 
             stack = 1;
             reduced_adj = adj;
-            
-            paths = sum(sum(adj))/2;
+            headers = 1:length(adj);
+            paths = (sum(sum(adj))/2)+1;
+            labels = 'a' : 'l';
             while(length(stack) ~= paths)
-            
-                links = ret_locs_of_ones(reduced_adj(stack(end),:));
-            
-                %% check if the link is a bridge
-                for j=1:length(links)
-                    adj_copy = adj;
-                    adj_copy(stack(end),links(j)) = 0;
-                    adj_copy(links(j),stack(end)) = 0;
-                    adj_copy
-                    ret = check_connected(adj_copy);
-                    
-                    
-                    
-                    if ret == 1
-                        %the link was not a bridge, therefore, can be
-                        %considered
-                        break;
-                    end
-              
+             
+                for k = 1:length(headers)
+                   if headers(k) == stack(end)
+                       break;
+                   end
                 end
-                if (ret == 1)
+
+                
+                [non_bridge, bridge] = is_bridge(reduced_adj,headers,k);
+                
+                if (~isempty(non_bridge))
                     %  not a bridge
-                    reduced_adj(stack(end),links(j)) = 0;
-                    reduced_adj(links(j),stack(end)) = 0;
-                    reduced_adj
-                    stack
-                    links
                     
-                    stack (end+1) = links(j);
+                    for iter = 1:length(headers)
+                        if headers(iter) == non_bridge(1)
+                            break;
+                        end
+                    end
+                    
+                    
+                    for iterator = 1:length(headers)
+                        if headers(iterator) == stack(end)
+                            reduced_adj(iterator,iter) = 0;
+                            reduced_adj(iter,iterator) = 0;
+                        end
+                    end
+                    stack (end+1) = non_bridge(1);
+                    
+                    %sprintf('link %s to %s broken',labels(stack(end-1)),labels(non_bridge(1)))
 
                     
-                elseif(ret == -1)
+                elseif(isempty(non_bridge) && ~isempty(bridge) && length(bridge)==1)
                     % all the links are bridge
-                    reduced_adj(stack(end),links(j)) = 0;
-                    reduced_adj(links(j),stack(end)) = 0;                   
-                    stack(end+1) = links(j);
-                    disp('gone here')
-
                     
+                    %reduced_adj(stack(end),:) = [];
+                    %reduced_adj(:,stack(end)) = [];
+                    
+                    
+                    stack(end+1) = (bridge(1));
+                    
+                    for iterator = 1:length(headers)
+                        if headers(iterator) == stack(end-1)
+                            headers(iterator) = [];
+                            labels(iterator) = [];
+                            reduced_adj(iterator,:) = [];
+                            reduced_adj(:,iterator) = [];
+                            break;
+                        end
+                    end
                 end
+            end
                 
                 
               
            
-            end
+            
         elseif option == 2
             %%%%
             % compute Eularian Path, start from one of the vertex
             % containing odd degree.
             
+            headers = 1:length(adj);
+            reduced_adj = adj;
+            paths = (sum(sum(adj))/2)+1;
+            
+            degrees = sum(adj);
+            
+            for check = 1:length(degrees)
+                if mod(degrees(check),2) == 1
+                    break;
+                end
+            end
+            
+            stack = check;
+            
+            while(length(stack)~=paths)
+                for k = 1:length(headers)
+                   if headers(k) == stack(end)
+                       break;
+                   end
+                end
+
+                
+                [non_bridge, bridge] = is_bridge(reduced_adj,headers,k);
+                
+                if (~isempty(non_bridge))
+                    %  not a bridge
+                    
+                    for iter = 1:length(headers)
+                        if headers(iter) == non_bridge(1)
+                            break;
+                        end
+                    end
+                    
+                    
+                    for iterator = 1:length(headers)
+                        if headers(iterator) == stack(end)
+                            reduced_adj(iterator,iter) = 0;
+                            reduced_adj(iter,iterator) = 0;
+                        end
+                    end
+                    stack (end+1) = non_bridge(1);
+                    
+                    %sprintf('link %s to %s broken',labels(stack(end-1)),labels(non_bridge(1)))
+
+                    
+                elseif(isempty(non_bridge) && ~isempty(bridge) && length(bridge)==1)
+                    % all the links are bridge
+                    
+                    %reduced_adj(stack(end),:) = [];
+                    %reduced_adj(:,stack(end)) = [];
+                    
+                    
+                    stack(end+1) = (bridge(1));
+                    
+                    for iterator = 1:length(headers)
+                        if headers(iterator) == stack(end-1)
+                            headers(iterator) = [];
+
+                            reduced_adj(iterator,:) = [];
+                            reduced_adj(:,iterator) = [];
+                            break;
+                        end
+                    end
+                end
+            end
             
             
         end
         
         
         
-        % http://www.ctl.ua.edu/math103/euler/howcanwe.htm
+       
         result = stack;
         
     end
