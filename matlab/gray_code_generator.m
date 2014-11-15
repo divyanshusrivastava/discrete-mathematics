@@ -1,6 +1,7 @@
+%% Gray Code Generator
 % this script generates gray codes of n bits
 % total 2^n -1 continuous gray codes will be generated.
-% this code followe\s a recursive approach. therefore, 
+% this code follows a recursive approach. therefore, 
 % it can be slow for large n
 
 
@@ -36,7 +37,8 @@ else
         end
         result = previous_container;
     end
-
+    fprintf('Gray code of %d bits',bits);
+    disp(' ');
     disp(result);
 end
 

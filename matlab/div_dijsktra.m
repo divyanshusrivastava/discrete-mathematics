@@ -47,7 +47,8 @@ disp(strcat('Computing route from-',labels(source),'(',int2str(source),')','-to-
 if source == destination
     disp('Source and Destinations are the same.!');
 else
-    adj_airports(adj_airports == 0) = sum(max(adj_airports)*10) ; % a sufficiently large value
+    path_inf = sum(max(adj_airports)*10);
+    adj_airports(adj_airports == 0) = path_inf ; % a sufficiently large value
     n = size(adj_airports,1);
     S(1:n) = 0;     
     dist(1:n) = inf;   
@@ -88,14 +89,20 @@ else
     
     pathoutcost = dist(destination);
     
-    disp('Shortest Path: ');
-    stepwise_dist = 0;
-    for i = 1:length(pathout)
-        if i ~= 1
-            stepwise_dist = stepwise_dist + adj_airports(pathout(i-1),pathout(i));
+    if (pathoutcost == path_inf)
+        disp('No Route Exists between the selected airports: ');
+        disp(strcat(labels(pathout(1)),'~~',labels(pathout(2))));
+    else
+        disp('Shortest Path: ');
+        stepwise_dist = 0;
+        for i = 1:length(pathout)
+            if i ~= 1
+                stepwise_dist = stepwise_dist + adj_airports(pathout(i-1),pathout(i));
+            end
+            disp(strcat(labels(pathout(i)),'~~',int2str(stepwise_dist)));
         end
-        disp(strcat(labels(pathout(i)),'~~',int2str(stepwise_dist)));
-    end
     
-    disp(strcat('Total Distance--',int2str(pathoutcost)));
+    
+        disp(strcat('Total Distance--',int2str(pathoutcost)));
+    end
 end

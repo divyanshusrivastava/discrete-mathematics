@@ -1,12 +1,9 @@
-function graph_plotter(adj)
-% this function plots a graph for the entered adjacency matrix
-% it assumes that the user has entered a valid adjacency matrix
+function fleury_plot(adj, result)
+% This function takes input an adjacency matrix and a solved eularian trial
+% in it, and plots the graph ste[p-by-step
 
-    clc;
-    close all;
-
-    %load('adj');
-
+   
+    
     L = length(adj);
     theta = (360/L);
     %temp = zeros(1,L);
@@ -22,21 +19,18 @@ function graph_plotter(adj)
         y(i) = sind(i*theta);
     end
 
-    figure (1);
+    
     plot(x,y,'rh');
     hold on
     for i=1:L
         text(x(i),y(i),labels{i},'VerticalAlignment','bottom','HorizontalAlignment','right','fontWeight','bold');
     end
-    for i=1:L
-       temp = adj(i,:);
-       for j=1:L
-          if (temp(j)~=0)
-             plot([x(i),x(j)],[y(i),y(j)],'b.-','LineWidth',2) ;
-          end
-       end
+    
+    for i = 1:length(result)-1
+        plot([x(result(i)),x(result(i+1))],[y(result(i)),y(result(i+1))],'r.-','LineWidth',2);
+        pause(0.5);
     end
-
-
-    %scheduler(adj);
+    
 end
+
+

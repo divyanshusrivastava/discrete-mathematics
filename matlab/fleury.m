@@ -1,11 +1,11 @@
-function [result] = fleury (adj)
+function fleury (adj)
 % This fuunction uses fleury's algorithm to return an Eularian trial in an
 % Eularian Graph.
-% it takes input an adjacency matrix only.
+% it takes input an adjacency matrix (adj) only.
 
     
     clc;
-    
+%% Checking if the dimensions of the entered matrix
     if (length(size(adj))~=2)
         error('Adjacency Matrix should be 2 Dimensional');
         
@@ -14,24 +14,22 @@ function [result] = fleury (adj)
         
     else
        
-        %%%%%
-        % check if the graph has proper values
-        %%%%%
+%% Checking if the matrix has proper values
         len = length(adj);
         
-        %check if the graph is connected or not
-        
-        ret = check_connected(adj);
-        
+% check if the graph is connected or not        
+        ret = check_connected(adj);        
         if ret == 0 
-            %% disconnected
+            % disconnected
             error('The graph is disconnected!!');
         end
         
                     
-        % check if the graph will have circuit or path
-        degrees = zeros(len,1);
-        
+% check if the graph will have circuit or path
+        figure(1)
+        graph_plotter(adj);
+        pause(1);
+        degrees = zeros(len,1);        
         flag = 0;
         for i = 1:len
             degrees(i) = sum(adj(:,i));
@@ -39,7 +37,6 @@ function [result] = fleury (adj)
                 flag = flag+1;
             end
         end
-
         
         if (flag == 0)
             disp('Computing Eularian Circuit');
@@ -90,16 +87,8 @@ function [result] = fleury (adj)
                     end
                     stack (end+1) = non_bridge(1);
                     
-                    %sprintf('link %s to %s broken',labels(stack(end-1)),labels(non_bridge(1)))
-
-                    
                 elseif(isempty(non_bridge) && ~isempty(bridge) && length(bridge)==1)
                     % all the links are bridge
-                    
-                    %reduced_adj(stack(end),:) = [];
-                    %reduced_adj(:,stack(end)) = [];
-                    
-                    
                     stack(end+1) = (bridge(1));
                     
                     for iterator = 1:length(headers)
@@ -114,10 +103,6 @@ function [result] = fleury (adj)
                 end
             end
                 
-                
-              
-           
-            
         elseif option == 2
             %%%%
             % compute Eularian Path, start from one of the vertex
@@ -149,14 +134,11 @@ function [result] = fleury (adj)
                 
                 if (~isempty(non_bridge))
                     %  not a bridge
-                    
                     for iter = 1:length(headers)
                         if headers(iter) == non_bridge(1)
                             break;
                         end
                     end
-                    
-                    
                     for iterator = 1:length(headers)
                         if headers(iterator) == stack(end)
                             reduced_adj(iterator,iter) = 0;
@@ -165,22 +147,12 @@ function [result] = fleury (adj)
                     end
                     stack (end+1) = non_bridge(1);
                     
-                    %sprintf('link %s to %s broken',labels(stack(end-1)),labels(non_bridge(1)))
-
-                    
                 elseif(isempty(non_bridge) && ~isempty(bridge) && length(bridge)==1)
                     % all the links are bridge
-                    
-                    %reduced_adj(stack(end),:) = [];
-                    %reduced_adj(:,stack(end)) = [];
-                    
-                    
                     stack(end+1) = (bridge(1));
-                    
                     for iterator = 1:length(headers)
                         if headers(iterator) == stack(end-1)
                             headers(iterator) = [];
-
                             reduced_adj(iterator,:) = [];
                             reduced_adj(:,iterator) = [];
                             break;
@@ -188,16 +160,16 @@ function [result] = fleury (adj)
                     end
                 end
             end
-            
-            
         end
-        
-        
-        
-       
         result = stack;
-        
+        fleury_plot(adj, result);
+        disp('Generated result ');
+        labels = {'A','B','C','D','E','F','G','H','I','J','K','L'};
+        result_names = '.';
+        for i = 1:length(result)
+            result_names = strcat(result_names,'-->',labels(result(i)));
+        end
+        disp(char(result_names));
     end
-    
 end
 

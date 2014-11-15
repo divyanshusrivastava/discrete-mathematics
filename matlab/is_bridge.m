@@ -5,8 +5,7 @@ function [ non_bridge, bridge ] = is_bridge(adj, headers, vertex)
     
    non_bridge = [];
    bridge = [];
-   disp('from is_bridge()');
-   links = ret_locs_of_ones(adj(vertex,:))
+   links = ret_locs_of_ones(adj(vertex,:));
    
    for i = 1:length(links)
        adj_xerox = adj;
