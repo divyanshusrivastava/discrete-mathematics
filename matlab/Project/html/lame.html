@@ -1,0 +1,226 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>GABRIEL LAME'S COUNTING OF TRIANGULATION</title><meta name="generator" content="MATLAB 8.1"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2014-11-20"><meta name="DC.source" content="lame.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>GABRIEL LAME'S COUNTING OF TRIANGULATION</h1><!--introduction--><p>This script uses Lame's modern method to get the number of triangulations of a regular polygon, and the uses an algorithm to draw all those possible triangulations. For simplicity in terms of exactness and execution time and memory constraints, the algorithm is not feeded with a polygon of more than 15 sides.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#2">Taking a valid input</a></li><li><a href="#3">Simplicity conditions</a></li><li><a href="#4">Generating Adjacency matrix of the regular polygon of n sides</a></li><li><a href="#5">Returning the number of triangulations</a></li><li><a href="#6">Computing triangulations</a></li><li><a href="#7">Displaying the results</a></li></ul></div><pre class="codeinput">clear <span class="string">all</span>;
+clc;
+close <span class="string">all</span>;
+</pre><h2>Taking a valid input<a name="2"></a></h2><pre class="codeinput">n = input(<span class="string">'Enter the number of sides of the polygon: '</span>);
+
+<span class="keyword">if</span> (mod(n,1)) ~= 0
+    error(<span class="string">'Number of sides should be integral!'</span>);
+<span class="keyword">elseif</span> (n &lt; 3)
+    error(<span class="string">'Number of sides should be positive, greater than 3!'</span>);
+<span class="keyword">elseif</span> (length(n) ~= 1)
+    error(<span class="string">'Number of sides should be scalar, recieved vector/matrix'</span>);
+<span class="keyword">end</span>
+</pre><h2>Simplicity conditions<a name="3"></a></h2><pre class="codeinput"><span class="keyword">if</span> n&gt;15
+    disp(<span class="string">'A smaller number ( &lt; 15 ) recommended! '</span>);
+    input(<span class="string">'Hit return to restart.'</span>);
+    lame;
+<span class="keyword">end</span>
+</pre><h2>Generating Adjacency matrix of the regular polygon of n sides<a name="4"></a></h2><pre class="codeinput">adjacency = get_adj_regular(n);
+</pre><h2>Returning the number of triangulations<a name="5"></a></h2><pre class="codeinput">Pn = get_catalan(n-2);
+disp(<span class="string">'Number of triangulations: '</span>);
+disp(Pn);
+</pre><h2>Computing triangulations<a name="6"></a></h2><pre class="codeinput">previous = [0 1 1;1 0 1;1 1 0];
+
+catalans = zeros(1,n-2);
+<span class="keyword">for</span> i = 3:n
+    catalans(i-2) = get_catalan(i-2);
+<span class="keyword">end</span>
+
+
+<span class="keyword">for</span> count = 4:n
+<span class="comment">% one cycle of this loop should return triangulations of count sided</span>
+<span class="comment">% polygon, which should be equal to catalans(count-2)</span>
+    new = zeros(count,count,catalans(count-2));
+    iterator = 1;
+    <span class="keyword">for</span> cat_count = 1:catalans(count-3)
+    <span class="comment">% one cycle of this loop should give all children of one of the</span>
+    <span class="comment">% triangulation of count-1 sided polygon</span>
+        temp_adj = previous(:,:,cat_count);
+
+        new(:,:,iterator) = tri_gen_1(temp_adj);
+        iterator = iterator + 1;
+
+        [number,mat] = tri_gen_3(temp_adj);
+        <span class="keyword">for</span> i = 1:number
+           new(:,:,iterator) = mat(:,:,i);
+           iterator = iterator+1;
+        <span class="keyword">end</span>
+
+        new(:,:,iterator) = tri_gen_2(temp_adj);
+        iterator = iterator + 1;
+
+
+    <span class="keyword">end</span>
+    previous = new;
+<span class="keyword">end</span>
+
+triangulations = previous;
+</pre><h2>Displaying the results<a name="7"></a></h2><pre class="codeinput"><span class="keyword">if</span> n == 3
+    graph_plotter(triangulations);
+    set(findobj(gcf, <span class="string">'type'</span>,<span class="string">'axes'</span>), <span class="string">'Visible'</span>,<span class="string">'off'</span>);
+
+<span class="keyword">elseif</span> n == 4
+    <span class="comment">% TODO:</span>
+    <span class="comment">% Plot the possible triangulations side by side...customize</span>
+    <span class="comment">% graph_plotter such that it takes another (OPTIONAL) input, which is</span>
+    <span class="comment">% actually the subplot handle</span>
+<span class="keyword">end</span>
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2013a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% GABRIEL LAME'S COUNTING OF TRIANGULATION
+% This script uses Lame's modern method to get the number of triangulations
+% of a regular polygon, and the uses an algorithm to draw all those
+% possible triangulations. For simplicity in terms of exactness and
+% execution time and memory constraints, the algorithm is not feeded with a polygon of more than
+% 15 sides.
+
+%%
+clear all;
+clc;
+close all;
+
+%% Taking a valid input
+n = input('Enter the number of sides of the polygon: ');
+
+if (mod(n,1)) ~= 0
+    error('Number of sides should be integral!');
+elseif (n < 3) 
+    error('Number of sides should be positive, greater than 3!');
+elseif (length(n) ~= 1)
+    error('Number of sides should be scalar, recieved vector/matrix');
+end
+
+%% Simplicity conditions
+if n>15
+    disp('A smaller number ( < 15 ) recommended! ');
+    input('Hit return to restart.');
+    lame;
+end
+    
+%% Generating Adjacency matrix of the regular polygon of n sides
+adjacency = get_adj_regular(n);
+
+
+%% Returning the number of triangulations
+Pn = get_catalan(n-2); 
+disp('Number of triangulations: ');
+disp(Pn);
+
+%% Computing triangulations
+previous = [0 1 1;1 0 1;1 1 0];
+
+catalans = zeros(1,n-2);
+for i = 3:n
+    catalans(i-2) = get_catalan(i-2);
+end
+
+
+for count = 4:n
+% one cycle of this loop should return triangulations of count sided
+% polygon, which should be equal to catalans(count-2)
+    new = zeros(count,count,catalans(count-2));
+    iterator = 1;
+    for cat_count = 1:catalans(count-3)
+    % one cycle of this loop should give all children of one of the
+    % triangulation of count-1 sided polygon
+        temp_adj = previous(:,:,cat_count);
+        
+        new(:,:,iterator) = tri_gen_1(temp_adj);
+        iterator = iterator + 1;
+        
+        [number,mat] = tri_gen_3(temp_adj);
+        for i = 1:number
+           new(:,:,iterator) = mat(:,:,i);
+           iterator = iterator+1;
+        end
+        
+        new(:,:,iterator) = tri_gen_2(temp_adj);
+        iterator = iterator + 1;
+        
+
+    end
+    previous = new;
+end
+
+triangulations = previous;
+%% Displaying the results
+
+if n == 3
+    graph_plotter(triangulations);
+    set(findobj(gcf, 'type','axes'), 'Visible','off');
+    
+elseif n == 4
+    % TODO:
+    % Plot the possible triangulations side by side...customize
+    % graph_plotter such that it takes another (OPTIONAL) input, which is
+    % actually the subplot handle
+end
+##### SOURCE END #####
+--></body></html>

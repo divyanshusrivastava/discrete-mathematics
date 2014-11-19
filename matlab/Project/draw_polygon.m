@@ -27,7 +27,7 @@ function draw_polygon( n )
         hold on;
         plot([x(1),x(end)],[y(1),y(end)],'b.-','LineWidth',2);
         set(findobj(gcf, 'type','axes'), 'Visible','off')
-        % TODO: REMOVE SCALE
+        
     end
 
 end
