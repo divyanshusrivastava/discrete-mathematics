@@ -79,10 +79,10 @@ triangulations = previous;
 if n == 3
     graph_plotter(triangulations);
     set(findobj(gcf, 'type','axes'), 'Visible','off');
-    
-elseif n == 4
-    % TODO:
-    % Plot the possible triangulations side by side...customize
-    % graph_plotter such that it takes another (OPTIONAL) input, which is
-    % actually the subplot handle
 end
+    
+    for i = 1:length(triangulations)
+        graph_plotter(triangulations(:,:,i));
+        set(findobj(gcf, 'type','axes'), 'Visible','off');
+        pause(1);
+    end
