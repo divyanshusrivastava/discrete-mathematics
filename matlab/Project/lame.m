@@ -80,9 +80,11 @@ if n == 3
     graph_plotter(triangulations);
     set(findobj(gcf, 'type','axes'), 'Visible','off');
 end
-    
-    for i = 1:length(triangulations)
+
+
+
+for i = 1:Pn
         graph_plotter(triangulations(:,:,i));
         set(findobj(gcf, 'type','axes'), 'Visible','off');
         pause(1);
-    end
+end
